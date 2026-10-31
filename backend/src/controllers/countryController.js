@@ -1,0 +1,6 @@
+import { getCountries, getCountry } from '../services/countryService.js';
+
+export async function listCountries(req, res, next) { try { res.json({ success: true, data: await getCountries(), message: 'Countries loaded.' }); } catch (error) { next(error); } }
+export async function showCountry(req, res, next) { try { res.json({ success: true, data: await getCountry(req.params.code), message: 'Country loaded.' }); } catch (error) { next(error); } }
+export async function regions(req, res, next) { try { const values = [...new Set((await getCountries()).map((country) => country.region).filter((value) => value !== 'Not available'))].sort(); res.json({ success: true, data: values, message: 'Regions loaded.' }); } catch (error) { next(error); } }
+export async function compareCountries(req, res, next) { try { const { first, second } = req.query; if (!first || !second) return res.status(400).json({ success: false, message: 'Both first and second country codes are required.', code: 'MISSING_COUNTRIES' }); if (String(first).toUpperCase() === String(second).toUpperCase()) return res.status(400).json({ success: false, message: 'Choose two different countries.', code: 'DUPLICATE_COUNTRIES' }); res.json({ success: true, data: { first: await getCountry(first), second: await getCountry(second) }, message: 'Comparison loaded.' }); } catch (error) { next(error); } }

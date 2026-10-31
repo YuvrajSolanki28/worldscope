@@ -1,0 +1,21 @@
+import cors from 'cors';
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import { env } from './config/env.js';
+import { errorHandler, notFound } from './middleware/errorHandler.js';
+import { countryRouter, regionRouter } from './routes/countries.js';
+import { historyRouter } from './routes/history.js';
+
+export const app = express();
+app.disable('x-powered-by');
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(cors({ origin: env.frontendUrl.split(',').map((value) => value.trim()), methods: ['GET'], optionsSuccessStatus: 204 }));
+app.use(express.json({ limit: '20kb' }));
+app.use('/api', rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false }));
+app.get('/api/health', (req, res) => res.json({ success: true, data: { status: 'ok', timestamp: new Date().toISOString() }, message: 'WorldScope API is healthy.' }));
+app.use('/api/countries', countryRouter);
+app.use('/api/regions', regionRouter);
+app.use('/api/history', historyRouter);
+app.use(notFound);
+app.use(errorHandler);

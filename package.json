@@ -1,0 +1,19 @@
+{
+  "name": "worldscope",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["frontend", "backend"],
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c magenta,cyan \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w frontend",
+    "test": "npm run test -w backend && npm run test -w frontend",
+    "lint": "npm run lint -w backend && npm run lint -w frontend",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "concurrently": "latest",
+    "prettier": "latest"
+  },
+  "overrides": { "minimatch": "^11.0.3" }
+}

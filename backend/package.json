@@ -1,0 +1,28 @@
+{
+  "name": "@worldscope/backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "seed": "node src/data/seed.js",
+    "test": "vitest run",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "dependencies": {
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "express-rate-limit": "latest",
+    "helmet": "latest",
+    "mongoose": "latest"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "eslint": "9.39.5",
+    "globals": "latest",
+    "supertest": "latest",
+    "vitest": "latest"
+  }
+}

@@ -1,0 +1,23 @@
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, BookOpen, GitCompare, MapPinOff } from 'lucide-react';
+import { CountryDetailsCard } from '../components/CountryDetailsCard';
+import { EmptyState } from '../components/EmptyState';
+import { ErrorMessage } from '../components/ErrorMessage';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { FavouriteButton } from '../components/FavouriteButton';
+import { api } from '../services/api';
+import { useCountries } from '../hooks/useCountries';
+import type { Country } from '../types/country';
+import { flagUrl, formatNumber } from '../utils/format';
+
+export function CountryDetails() {
+  const { code = '' } = useParams(); const navigate = useNavigate(); const all = useCountries();
+  const [country, setCountry] = useState<Country | null>(null); const [loading, setLoading] = useState(true); const [error, setError] = useState('');
+  useEffect(() => { const controller = new AbortController(); setLoading(true); setError(''); api.country(code, controller.signal).then(setCountry).catch((caught) => { if ((caught as Error).name !== 'AbortError') setError((caught as Error).message); }).finally(() => setLoading(false)); return () => controller.abort(); }, [code]);
+  if (loading) return <div className="page-container py-12"><LoadingSpinner message="Loading country details…" /></div>;
+  if (error) return <div className="page-container py-12"><ErrorMessage message={error} /></div>;
+  if (!country) return <div className="page-container py-12"><EmptyState icon={<MapPinOff className="h-6 w-6" />} title="Country not found"><Link to="/explore" className="btn btn-primary">Explore Countries</Link></EmptyState></div>;
+  return <div className="page-fade-in page-container py-8 md:py-10"><button type="button" onClick={() => navigate(-1)} className="btn btn-ghost -ml-3"><ArrowLeft className="h-4 w-4" />Back</button><section className="card mt-4 grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-center lg:gap-10"><img src={flagUrl(country)} alt={country.flagAlt || `Flag of ${country.name}`} className="aspect-[3/2] w-full rounded-lg border border-line object-cover" /><div><span className="inline-block rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold text-brand">{country.region}{country.subregion ? ` · ${country.subregion}` : ''}</span><h1 className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl">{country.name}</h1><p className="mt-1 text-subtle">{country.officialName}</p><div className="mt-6 grid grid-cols-2 gap-3"><Stat label="Capital" value={country.capital} /><Stat label="Population" value={formatNumber(country.population)} /></div><div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap"><FavouriteButton countryCode={country.code} countryName={country.name} variant="full" /><Link to={`/compare?a=${country.code}`} className="btn btn-secondary"><GitCompare className="h-4 w-4" />Compare Country</Link><Link to={`/country/${country.code}/history`} className="btn btn-secondary"><BookOpen className="h-4 w-4" />View Country History</Link></div></div></section><div className="mt-6 grid gap-6 lg:grid-cols-3"><div className="lg:col-span-2"><CountryDetailsCard country={country} /></div><aside className="space-y-6"><section className="card p-5"><h2 className="font-semibold text-ink">Bordering countries</h2>{country.borders.length ? <ul className="mt-3 flex flex-wrap gap-2">{country.borders.map((border) => { const neighbour = all.countries.find((item) => item.code === border); return <li key={border}><Link to={`/country/${border}`} className="inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand-soft px-3 py-1 text-sm font-medium text-brand hover:bg-brand hover:text-white">{neighbour?.name || border}</Link></li>; })}</ul> : <p className="mt-2 text-sm text-subtle">No land borders recorded.</p>}</section><section className="card p-5"><BookOpen className="h-5 w-5 text-brand" /><h2 className="mt-3 font-semibold text-ink">Learn its history</h2><p className="mt-1 text-sm text-subtle">See sourced events from {country.name}’s past on a simple timeline.</p><Link to={`/country/${country.code}/history`} className="btn btn-primary mt-4 w-full">View Country History</Link></section></aside></div></div>;
+}
+function Stat({ label, value }: { label: string; value: string }) { return <div className="rounded-lg border border-line bg-page p-4"><p className="text-xs font-medium uppercase tracking-wide text-subtle">{label}</p><p className="mt-1 font-semibold text-ink">{value}</p></div>; }
