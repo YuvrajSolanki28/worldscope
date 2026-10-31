@@ -123,7 +123,12 @@ The automated coverage includes country normalization, search/filter/sort behavi
 
 ## Vercel deployment
 
-The repository includes a full-stack `vercel.json`: Vite builds into `frontend/dist`, while `api/index.js` exposes the Express backend as a Vercel Function. Add `REST_COUNTRIES_API_KEY` in the Vercel project environment before deploying. `MONGODB_URI` is optional because curated history has a read-only fallback.
+Deploy the repository as two Vercel projects:
+
+- `backend/` is the Express API. Add `REST_COUNTRIES_API_KEY` and `FRONTEND_URL` to its Vercel environment. `MONGODB_URI` is optional because curated history has a read-only fallback.
+- `frontend/` is the Vite application. Add `VITE_API_URL` with the backend deployment URL followed by `/api`.
+
+The frontend project includes an SPA rewrite so client-side routes continue to work when opened directly.
 
 ## Known limitations
 

@@ -19,3 +19,5 @@ app.use('/api/regions', regionRouter);
 app.use('/api/history', historyRouter);
 app.use(notFound);
 app.use(errorHandler);
+
+export default app;
