@@ -7,5 +7,6 @@ coverage/
 *.log
 *.zip
 .vercel/
+docs/
 frontend-src-before-cleanup-backup/
 frontend-pre-magic-ui-backup/
